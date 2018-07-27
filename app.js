@@ -9,13 +9,17 @@ const clima = require('./clima/clima');
 
 //console.log(argv.direccion);
 
-lugar.getDireccionLatLng(argv.direccion)
-    .then(resp => {
-        //console.log(resp);
-        clima.getClima(resp.lat, resp.lng)
-            .then(resp2 => {
-                console.log(`\n\t${resp.direccion}.\n\tUbicación: Latitud ${resp.lat}, Longitud ${resp.lng}).\n\tTemperatura actual: ${resp2.temp}°C.\n`);
-            })
-            .catch(e => console.log(e));
-    })
+let getInfo = async(direccion) => {
+    try {
+        let ubicacion = await lugar.getDireccionLatLng(direccion);
+        let climaRes = await clima.getClima(ubicacion.lat, ubicacion.lng);
+        return `\n\t${ubicacion.direccion}.\n\tUbicación: Latitud ${ubicacion.lat}, Longitud ${ubicacion.lng}).\n\tTemperatura actual: ${climaRes.temp}°C.\n`;
+    } catch (e) {
+        console.log(e);
+        return `\n No hay resultados para la dirección solicitada (${direccion}).\n`;
+    }
+};
+
+getInfo(argv.direccion)
+    .then(mensaje => console.log(mensaje))
     .catch(e => console.log(e));
